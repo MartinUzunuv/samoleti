@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Samoleti</title>
+  </head>
+  <body>
+    <script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io();
+</script>
+<div id="main">
+  <form>
+      <label for="name">Game name:</label>
+      <input type="text" id="name" name="name" required>
+      <button type="submit" id="submit-button">Submit</button>
+    </form>
+</div>
+<script src="/game"></script>
+<script src="/main"></script>
+  </body>
+</html>
