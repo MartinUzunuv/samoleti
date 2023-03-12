@@ -26,19 +26,19 @@ games = [];
 players = [];
 
 io.on("connection", (socket) => {
-  players.push({ name: socket.id, game: null, my:{x:50, y:90} });
+  players.push({ name: socket.id, game: null, my: { x: 50, y: 90 } });
 
   socket.on("disconnect", () => {
     let index = players.findIndex((obj) => obj.name === socket.id);
 
     if (index !== -1) {
       players.splice(index, 1);
-      for(let i = 0; i < games.length; i++) {
-        for(let j = 0; j < games[i].players.length; j++) {
-          if(games[i].players[j] === socket.id){
+      for (let i = 0; i < games.length; i++) {
+        for (let j = 0; j < games[i].players.length; j++) {
+          if (games[i].players[j] === socket.id) {
             games[i].players.splice(j, 1);
           }
-          if(games[i].players.length === 0){
+          if (games[i].players.length === 0) {
             games.splice(i, 1);
             break;
           }
@@ -60,35 +60,30 @@ io.on("connection", (socket) => {
       }
     }
     if (create) {
-      games.push({ name: sesion, players: [socket.id] });
+      games.push({ name: sesion, players: [socket.id], bullets: [] });
     }
   });
 
-  socket.on('updateMe', (obj, callback) => {
+  socket.on("updateMe", (obj, callback) => {
     for (let i = 0; i < players.length; i++) {
       if (players[i].name === socket.id) {
         players[i].my = obj.my;
         sesion = obj.sesion;
-        let teammates = []
-        for(let j = 0; j < players.length; j++) {
-          if(players[j].game === sesion && players[j].name !== socket.id) {
-            teammates.push(players[j].my)
+        let teammates = [];
+        for (let j = 0; j < players.length; j++) {
+          if (players[j].game === sesion && players[j].name !== socket.id) {
+            teammates.push(players[j].my);
           }
         }
-        callback({teammates:teammates});
+        games.forEach((game)=>{
+          if(game.name === players[i].game){
+            callback({ teammates: teammates, bullets: game.bullets });
+          }
+        })
         break;
       }
     }
   });
-  
-
-
-
-
-
-
-
-
 });
 
 setInterval(() => {
@@ -98,4 +93,19 @@ setInterval(() => {
   // console.log(players);
   // console.log("");
   // console.log("");
-}, 1000);
+  games.forEach((game) => {
+    players.forEach((player) => {
+      if (player.game === game.name) {
+        game.bullets.push({ x: player.my.x, y: player.my.y, owner: player.name });
+      }
+    });
+  });
+}, 500);
+
+setInterval(()=>{
+  games.forEach((game) => {
+    game.bullets.forEach((bullet) => {
+      bullet.y-=2
+    })
+  });
+},20)

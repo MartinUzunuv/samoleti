@@ -3,9 +3,17 @@ y = window.innerHeight / 100;
 
 my = { x: 50, y: 90 };
 
-function draw(ctx,teammates) {
-  ctx.fillStyle = "white";
+function draw(ctx,teammates,bullets) {
+  ctx.fillStyle = "black";
   ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  bullets.forEach(bullet => {
+    if(bullet.owner !== null){
+        ctx.fillStyle = "white";
+    }else{
+        ctx.fillStyle = "red";
+    }
+    ctx.fillRect(bullet.x * x - 1 * x, bullet.y * y - 1 * x, 2 * x, 2 * y);
+  });
   ctx.fillStyle = "green";
   teammates.forEach(teammate => {
     ctx.fillRect(teammate.x * x - 5 * x, teammate.y * y - 5 * x, 10 * x, 10 * y);
@@ -44,7 +52,7 @@ function game(ctx, sesion) {
     }
     socket.emit("updateMe", {my:my, sesion:sesion}, (response) => {
       //console.log(response);
-      draw(ctx,response.teammates);
+      draw(ctx,response.teammates, response.bullets);
     });
   }, 50);
 }
